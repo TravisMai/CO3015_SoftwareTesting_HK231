@@ -1,0 +1,24 @@
+browser: edge
+name: Edit Submission
+url: https://school.moodledemo.net/login/index.php
+title: Log in to the site
+test_steps: 
+# - action: [_type, key, value]
+  - try_click: [CONTAIN, Log out, button]
+  - input: [ID, username, student]
+  - input: [ID, password, moodle]
+  - click: [ID, loginbtn, button]
+  - expect: [TITLE, My courses, title]
+  - click: [CONTAIN, Dashboard, link]
+  - click: [CONTAIN, Assignment 02 (16th century), link]
+  - try_click: [CONTAIN, Remove submission, button]
+  - try_click: [CONTAIN, Continue, button]
+  - click: [CONTAIN, Add submission, button]
+  - click: [CONTAIN, Add... , link]
+  - upload: [NAME, repo_upload_file, /file/abc.pdf]
+  - click : [CONTAIN, Upload this file, button]
+  - click : [NAME, submitbutton, input]
+  - click : [CONTAIN, Edit submission, button]
+  - click : [CONTAIN, abc.pdf, link]
+  - input : [INITIAL, abc.pdf, new_abc.pdf]
+  - click : [CONTAIN, Update, button]
