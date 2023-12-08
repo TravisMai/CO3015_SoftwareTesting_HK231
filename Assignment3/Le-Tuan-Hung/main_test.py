@@ -2,6 +2,8 @@ import unittest
 import yaml
 import os
 import glob
+import sys
+import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -34,7 +36,7 @@ class GoogleTestCase(unittest.TestCase):
 
     def load_test_case(self):
         print("load test cases")
-        files = glob.glob(os.getcwd() + "/testcases/*.yml")
+        files = glob.glob(os.path.dirname(os.path.abspath(__file__)) + "/testcases/*.yml")
         for filename in files:
             with open(filename) as file:
                 self.test_config.append(yaml.safe_load(file))
@@ -43,45 +45,77 @@ class GoogleTestCase(unittest.TestCase):
         self.options = webdriver.EdgeOptions()
         self.options.add_argument("--start-maximized")
         self.options.add_argument("--enable-chrome-browser-cloud-management")
+        self.options.add_argument("--disable-extensions")
+        self.options.add_argument("--log-level=1")
+        self.options.add_argument("--silent")
+        self.options.add_argument("--show-capture=no")
         self.browser = webdriver.Edge(options=self.options)
         self.elem_dict = {"button":"button", "link":"a", "title":"title", "input":"input"}
         self.load_test_case()
         self.addCleanup(self.browser.quit)
 
-    def execute_common_logic(self, step_config, action, actionchains):
+    def execute_common_logic(self, step_config, action, actionchains, timeout=10):
         _type, key, value = step_config[0], step_config[1], step_config[2]
         by_type = getattr(By, _type.upper(), _type)
         try:
             if action == "click":
                 if by_type == "CONTAIN":
-                    xpath = f"//{self.elem_dict[value]}[.//span[contains(text(), '{key}')] or contains(text(), '{key}') or @title='{key}' or @class='{key}' or descendant::div[contains(text(), '{key}')]]"
-                elif by_type == "TITLE":
-                    xpath = f"//{self.elem_dict[value]}[@title='{key}']"
+                    xpath = (f"//{self.elem_dict[value]}[.//span[contains(text(), '{key}')]\
+                            or @title='{key}' or @class='{key}' or descendant::div[contains(text(), '{key}')]\
+                            or ancestor::div[contains(text(), '{key}')]]")
+                    search_key = (By.XPATH, xpath)
+                elif by_type == "TEXT":
+                    xpath = f"//{self.elem_dict[value]}[contains(text(), '{key}') or contains(@placeholder, '{key}')]"
+                    search_key = (By.XPATH, xpath)
                 else:
-                    self.browser.find_element(by_type, key).click()
-                    return True, "pass"
-                try:
-                    element = WebDriverWait(self.browser, 5).until(
-                        EC.presence_of_element_located((By.XPATH, xpath))
-                    )
-                    self.browser.execute_script("arguments[0].scrollIntoView(true);", element)
-                    self.browser.implicitly_wait(2)
-                except TimeoutException:
+                    search_key = (by_type, key)
+
+                element = WebDriverWait(self.browser, timeout).until(
+                    EC.presence_of_all_elements_located(search_key)
+                )
+                if len(element) > 0:
+                    start_time = time.time()
+                    while not element[0].is_displayed() and time.time() - start_time < timeout:
+                        self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                    element[0].click()
+                else:
+                    result = False
+                    msg = "Failed to appear or click on element within the specified timeout"
+            elif action == "input":
+                if by_type == "CONTAIN":
+                    xpath = (f"//input[.//span[contains(text(), '{key}')]\
+                            or @title='{key}' or @class='{key}' or descendant::div[contains(text(), '{key}')]\
+                            or ancestor::div[contains(text(), '{key}')]]")
+                    search_key = (By.XPATH, xpath)
+                elif by_type == "LABEL":
+                    xpath = f"//label[text() = '{key}']/following-sibling::div//input"
+                    search_key = (By.XPATH, xpath)
+                elif by_type == "TEXT":
+                    xpath = f"//input[contains(text(), '{key}') or contains(@placeholder, '{key}')]"                    
+                    search_key = (By.XPATH, xpath)
+                else:
+                    search_key = (by_type, key)
+
+                element = WebDriverWait(self.browser, timeout).until(
+                    EC.presence_of_all_elements_located(search_key)
+                )
+
+                if len(element) > 0:
+                    start_time = time.time()
+                    while not element[0].is_displayed() and time.time() - start_time < timeout:
+                        self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                    element[0].clear()
+                    element[0].send_keys(value)
+                else:
                     result = False
                     msg = "Failed to appear or click on element within the specified timeout"
 
-                element.click()
-            elif action == "input":
-                if by_type == "INITIAL":
-                    xpath = f"//{self.elem_dict[value]}[@data-initial-value='{key}']" 
-                    element = self.browser.find_element(By.XPATH, xpath)
-                else: 
-                    element = self.browser.find_element(by_type, key)
-                element.clear()
-                element.send_keys(value)
             elif action == "upload":
-                element = self.browser.find_element(by_type, key)
-                element.send_keys(os.getcwd() + value)
+                search_key = (by_type, key)
+                element = WebDriverWait(self.browser, 10).until(
+                    EC.presence_of_all_elements_located(search_key)
+                )
+                element[0].send_keys(os.path.dirname(os.path.abspath(__file__)) + value)
             elif action == "press":
                 if key.upper() == "GLOBAL":
                     actionchains.send_keys(getattr(Keys, value.upper(), value))
@@ -100,11 +134,6 @@ class GoogleTestCase(unittest.TestCase):
                     result = EC.visibility_of_element_located((By.XPATH, xpath))
                     if not result:
                         msg = "Failed to appear element"
-                elif by_type == "IMG_TITLE":
-                    xpath = f"//{self.elem_dict[value]}[.//img[@title='{key}']]"           
-                    result = EC.visibility_of_element_located((By.XPATH, xpath))
-                    if not result:
-                        msg = "Failed to appear element"
                 else:
                     result = EC.visibility_of_element_located((by_type, key))
                     if not result:
@@ -113,8 +142,12 @@ class GoogleTestCase(unittest.TestCase):
                 pass
             return True, "pass"
         except Exception as e:
-            msg = f"Failed to {action} {key} {value}"
-            return False, msg
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            msg = f"Failed to do {action} {key} {value}"
+        
+        return False, msg
       
     def test_execute(self):
         for testcase in self.test_config:
@@ -139,7 +172,7 @@ class GoogleTestCase(unittest.TestCase):
                         index -= 1
                     elif action.split("_")[0] == "try":
                         try:
-                            self.execute_common_logic(step_config, action.split("_")[1], actionchains)
+                            self.execute_common_logic(step_config, action.split("_")[1], actionchains, timeout=5)
                         except:
                             pass
                     elif action.split("_")[0] == "wait":
@@ -159,7 +192,7 @@ class GoogleTestCase(unittest.TestCase):
 
     def make_report(self):
         print("make report")
-        report_path = os.getcwd() + f"/report/{self.time_stamp}_report.txt"
+        report_path = os.path.dirname(os.path.abspath(__file__)) + f"/report/{self.time_stamp}_report.txt"
         with open(report_path, "w") as file:
             for key, value in self.test_report.items():
                 print(f"{key}: {value}")
