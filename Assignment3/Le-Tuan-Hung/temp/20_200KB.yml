@@ -5,6 +5,7 @@ title: Log in to the site
 test_steps: 
 # - action: [_type, key, value]
   - try_click: [TEXT, Log out, button]
+  - input: [ID, username, <clear>]
   - input: [ID, username, student]
   - input: [ID, password, moodle]
   - click: [ID, loginbtn, button]

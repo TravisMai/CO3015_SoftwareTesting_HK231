@@ -1,6 +1,0 @@
-Test submit 15 files 420KB: Expect to appear 15 files
-Test submit 15 files 420KB (2nd flow): Expect to appear 15 files
-Test submit 15 files 720KB: Expect to appear 15 files
-Test submit 20 files 200KB: Expect to appear 20 files
-Test submit 2 files 810KB: Expect to appear 2 files
-Edit Submission: Expect to appear new_abc.pdf

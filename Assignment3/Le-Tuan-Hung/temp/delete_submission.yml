@@ -1,10 +1,11 @@
 browser: edge
-name: Edit Submission
+name: Delete 1 submission file
 url: https://school.moodledemo.net/login/index.php
 title: Log in to the site
 test_steps: 
 # - action: [_type, key, value]
   - try_click: [TEXT, Log out, button]
+  - input: [ID, username, <clear>]
   - input: [ID, username, student]
   - input: [ID, password, moodle]
   - click: [ID, loginbtn, button]
@@ -19,14 +20,17 @@ test_steps:
   - click: [CONTAIN, Add... , link]
   - upload: [NAME, repo_upload_file, /file/abc.pdf]
   - click : [TEXT, Upload this file, button]
+  - click: [CONTAIN, Add... , link]
+  - upload: [NAME, repo_upload_file, /file/810KB.bin]
+  - click : [TEXT, Upload this file, button]
   - click : [NAME, submitbutton, input]
-  - expect: [CONTAIN, abc.pdf, all]
+  - expect: [CONTAIN, 2 files, all]
   - click : [TEXT, Edit submission, button]
   - click : [CONTAIN, abc.pdf, link]
-  - input : [LABEL, Name, new_abc.pdf]
-  - click : [TEXT, Update, button]
+  - click : [TEXT, Delete, button]
+  - click : [TEXT, "Yes", button]
   - click : [NAME, submitbutton, input]
   - expect: [CONTAIN, Submitted for grading, all]
-  - expect: [CONTAIN, new_abc.pdf, all]
+  - expect: [CONTAIN, 810KB.bin, all]
   - try_click: [TEXT, Remove submission, button]
   - try_click: [TEXT, Continue, button]

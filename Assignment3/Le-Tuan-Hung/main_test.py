@@ -4,6 +4,8 @@ import os
 import glob
 import sys
 import time
+import string
+import random
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -50,7 +52,7 @@ class GoogleTestCase(unittest.TestCase):
         self.options.add_argument("--silent")
         self.options.add_argument("--show-capture=no")
         self.browser = webdriver.Edge(options=self.options)
-        self.elem_dict = {"button":"button", "link":"a", "title":"title", "input":"input", "all": "*"}
+        self.elem_dict = {"button":"button", "link":"a", "title":"title", "input":"input", "all": "*", "div":"div"}
         self.load_test_case()
         self.addCleanup(self.browser.quit)
 
@@ -60,8 +62,14 @@ class GoogleTestCase(unittest.TestCase):
         result, msg = True, ""
         try:
             if action == "click":
-                if by_type == "CONTAIN":
-                    xpath = (f"//{self.elem_dict[value]}[.//span[contains(text(), '{key}')]\
+                if by_type.upper() == "ID":
+                    xpath = f"//{self.elem_dict[value]}[contains(@id, '{key}')]"
+                    search_key = (By.XPATH, xpath)
+                elif by_type == "MSG_BOX":
+                    xpath = f"//a[.//ancestor::strong[contains(text(), '{key}')]]"
+                    search_key = (By.XPATH, xpath)
+                elif by_type == "CONTAIN":
+                    xpath = (f"//{self.elem_dict[value]}[.//span[contains(text(), '{key}')] or contains(@aria-label, '{key}')\
                             or @title='{key}' or @class='{key}' or descendant::div[contains(text(), '{key}')]\
                             or ancestor::div[contains(text(), '{key}')]]")
                     search_key = (By.XPATH, xpath)
@@ -82,10 +90,33 @@ class GoogleTestCase(unittest.TestCase):
                 else:
                     result, msg = False, "Failed to appear or click on element within the specified timeout \n"
                     return result, msg
-
+            elif action == "goto":
+                if key == "self":
+                    if by_type.upper() == "URL":
+                        self.browser.get(value)
+                    elif by_type.upper() == "TITLE":
+                        self.browser.get(f"https://www.google.com/search?q={value}")
+                    elif by_type.upper() == "TAB":
+                        self.browser.switch_to.window(self.browser.window_handles[-1])
+                    else:
+                        result, msg = False, "Not support type of goto \n"
+                        return result, msg
+                elif key == "new":
+                    if by_type.upper() == "URL":
+                        self.browser.execute_script(f"window.open('{value}', 'new_window')")
+                    elif by_type.upper() == "TITLE":
+                        self.browser.execute_script(f"window.open('https://www.google.com/search?q={value}', 'new_window')")
+                    elif by_type.upper() == "TAB":
+                        self.browser.switch_to.window(self.browser.window_handles[-1])
+                    else:
+                        result, msg = False, "Not support type of goto \n"
+                        return result, msg
             elif action == "input":
+                if by_type.upper() == "ID":
+                    xpath = f"//input[contains(@id, '{key}')]"
+                    search_key = (By.XPATH, xpath)
                 if by_type == "CONTAIN":
-                    xpath = (f"//input[.//span[contains(text(), '{key}')]\
+                    xpath = (f"//input[.//span[contains(text(), '{key}')] or contains(@aria-label, '{key}')\
                             or @title='{key}' or @class='{key}' or descendant::div[contains(text(), '{key}')]\
                             or ancestor::div[contains(text(), '{key}')]]")
                     search_key = (By.XPATH, xpath)
@@ -106,10 +137,29 @@ class GoogleTestCase(unittest.TestCase):
                     start_time = time.time()
                     while not element[0].is_displayed() and time.time() - start_time < timeout:
                         self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                    element[0].clear()
+                    if value.startswith("<") and value.endswith(">"):
+                        cmd = value[1:-1].upper().split("_")
+                        code = cmd[0]
+                        number = int(cmd[1]) if len(cmd) > 1 else 1
+
+                        if code == "CLEAR":
+                            element[0].clear() 
+                            value = ""
+                        elif code.upper() == "RANDOM":
+                            value = ''.join(random.choice(string.ascii_letters) for x in range(number))
+
                     element[0].send_keys(value)
+                # expect the value sent
+                    value_appear_right = EC.text_to_be_present_in_element_value(search_key, value)(self.browser)
+                    if value_appear_right:
+                        result, msg = True, ""
+                    else:
+                        result, msg = False, f"Input send to {key} not as expected \n"
+
+                    return result, msg
+
                 else:
-                    result, msg = False, "Failed to appear or click on element within the specified timeout \n"
+                    result, msg = False, "Failed to appear or input on element within the specified timeout \n"
                     return result, msg
 
             elif action == "upload":
@@ -123,13 +173,17 @@ class GoogleTestCase(unittest.TestCase):
                     actionchains.send_keys(getattr(Keys, value.upper(), value))
                     actionchains.perform()
             elif action == "expect" or action == "expect_not":
+                if by_type.upper() == "ID":
+                    xpath = f"//{self.elem_dict[value]}[contains(@id, '{key}')]"
+                    search_key = (By.XPATH, xpath)                        
                 if by_type == "TITLE":
                     result = EC.title_contains(key)
                     if not result:
                         result, msg = False, "Failed to appear title \n"
                         return result, msg
                 if by_type == "CONTAIN":
-                    xpath = (f"//{self.elem_dict[value]}[.//span[contains(text(), '{key}')] or contains(text(), '{key}'))\
+                    xpath = (f"//{self.elem_dict[value]}[.//span[contains(text(), '{key}')]\
+                            or contains(@aria-label, '{key}') or contains(text(), '{key}'))\
                             or @title='{key}' or @class='{key}' or descendant::div[contains(text(), '{key}')]\
                             or ancestor::div[contains(text(), '{key}')]]")
                     search_key = (By.XPATH, xpath)
@@ -158,6 +212,7 @@ class GoogleTestCase(unittest.TestCase):
             return result, msg
       
     def test_execute(self):
+        result_dict = {True: "Passed", False: "Failed"}
         for testcase in self.test_config:
             print(testcase["name"])
             testcase_msg = ""
@@ -195,9 +250,10 @@ class GoogleTestCase(unittest.TestCase):
                     else:
                         result, msg = self.execute_common_logic(step_config, action, actionchains)
 
-                if msg != "":
-                    testcase_msg += msg
-                self.test_report.update({testcase["name"]: testcase_msg})
+
+                    if msg != "":
+                        testcase_msg += f"{result_dict[result]}: {msg}"
+                self.test_report.update({testcase["name"]: f"{result_dict[result]}\n{testcase_msg}"})
                 if not result:
                     break
 
