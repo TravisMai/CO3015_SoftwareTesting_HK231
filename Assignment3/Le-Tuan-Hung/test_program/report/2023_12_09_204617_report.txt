@@ -3,10 +3,10 @@ Passed: Expect to appear My courses
 Passed: Expect to appear Submitted for grading 
 Passed: Expect to appear 15 files 
 
-Test submit 15 files 420KB (2nd flow): Passed
+Test submit 5 files 420KB (2nd flow): Passed
 Passed: Expect to appear My courses 
 Passed: Expect to appear Submitted for grading 
-Passed: Expect to appear 15 files 
+Passed: Expect to appear 5 files 
 
 Test submit 15 files 720KB: Passed
 Passed: Expect to appear My courses 
@@ -23,10 +23,15 @@ Passed: Expect to appear My courses
 Passed: Expect to appear Submitted for grading 
 Passed: Expect to appear 2 files 
 
-Delete 1 submission file: Failed
+Delete 1 submission file: Pass
 Passed: Expect to appear My courses 
 Passed: Expect to appear 2 files 
-Failed: Failed to do click Update button 
+Passed: Expect to appear Submitted for grading
+Passed: Expect to appear 810KB.bin
+
+Overdue submission: Passed
+Passed: Expect to appear My courses 
+Passed: Expect to not appear Assignment 02 (16th century)
 
 Edit Submission: Passed
 Passed: Expect to appear My courses 

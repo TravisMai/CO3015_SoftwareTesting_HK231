@@ -38,7 +38,7 @@ class GoogleTestCase(unittest.TestCase):
 
     def load_test_case(self):
         print("load test cases")
-        files = glob.glob(os.path.dirname(os.path.abspath(__file__)) + "test_program/testcases/*.yml")
+        files = glob.glob(os.path.dirname(os.path.abspath(__file__)) + "/test_program/testcases/*.yml")
         for filename in files:
             with open(filename) as file:
                 self.test_config.append(yaml.safe_load(file))
@@ -259,7 +259,7 @@ class GoogleTestCase(unittest.TestCase):
 
     def make_report(self):
         print("make report")
-        report_path = os.path.dirname(os.path.abspath(__file__)) + f"test_program/report/{self.time_stamp}_report.txt"
+        report_path = os.path.dirname(os.path.abspath(__file__)) + f"/test_program/report/{self.time_stamp}_report.txt"
         with open(report_path, "w") as file:
             for key, value in self.test_report.items():
                 print(f"{key}: {value}")

@@ -18,7 +18,7 @@ test_steps:
   - try_click: [TEXT, Continue, button]
   - click: [TEXT, Add submission, button]
   - click: [CONTAIN, Add... , link]
-  - upload: [NAME, repo_upload_file, test_program/file/abc.pdf]
+  - upload: [NAME, repo_upload_file, /test_program/file/abc.pdf]
   - click : [TEXT, Upload this file, button]
   - click : [NAME, submitbutton, input]
   - expect: [CONTAIN, abc.pdf, all]

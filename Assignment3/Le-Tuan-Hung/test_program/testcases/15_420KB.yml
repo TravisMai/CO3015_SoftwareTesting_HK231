@@ -19,7 +19,7 @@ test_steps:
   - click: [TEXT, Add submission, button]
   - iteration_15:
     - click: [CONTAIN, Add... , link]
-    - upload: [NAME, repo_upload_file, test_program/file/420KB.bin]
+    - upload: [NAME, repo_upload_file, /test_program/file/420KB.bin]
     - click : [TEXT, Upload this file, button]
     - try_click: [TEXT, Rename, button]
   - click : [NAME, submitbutton, input]

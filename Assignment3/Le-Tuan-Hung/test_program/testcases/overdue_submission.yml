@@ -1,0 +1,14 @@
+browser: edge
+name: Overdue submission
+url: https://school.moodledemo.net/login/index.php
+title: Log in to the site
+test_steps: 
+# - action: [_type, key, value]
+  - try_click: [TEXT, Log out, button]
+  - input: [ID, username, <clear>]
+  - input: [ID, username, student]
+  - input: [ID, password, moodle]
+  - click: [ID, loginbtn, button]
+  - expect: [TITLE, My courses, title]
+  - click: [TEXT, Dashboard, link]
+  - expect_not: [TEXT, Assignment 02 (16th century), link]
