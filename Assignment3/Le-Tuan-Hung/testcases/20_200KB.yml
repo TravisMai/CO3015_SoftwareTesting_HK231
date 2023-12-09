@@ -1,10 +1,10 @@
 browser: edge
-name: Test submit 15 files 420KB
+name: Test submit 20 files 200KB
 url: https://school.moodledemo.net/login/index.php
 title: Log in to the site
 test_steps: 
 # - action: [_type, key, value]
-  - try_click: [CONTAIN, Log out, button]
+  - try_click: [TEXT, Log out, button]
   - input: [ID, username, student]
   - input: [ID, password, moodle]
   - click: [ID, loginbtn, button]
@@ -12,18 +12,19 @@ test_steps:
   - input: [NAME, search, Literature of France]
   - click: [CONTAIN, Literature of France 1100 - 1960, link]
   - wait_3_press: [KEY, global, ENTER]
-  - try_click: [CONTAIN, Open course index, button]
   - click: [CONTAIN, Assignment 02 (16th century), link]
-  - try_click: [CONTAIN, Remove submission, button]
-  - try_click: [CONTAIN, Continue, button]
+  - try_click: [TEXT, Remove submission, button]
+  - try_click: [TEXT, Continue, button]
   - click: [TEXT, Add submission, button]
-  - iteration_15:
+  - iteration_20:
     - click: [CONTAIN, Add... , link]
-    - upload: [NAME, repo_upload_file, /file/420KB.bin]
-    - click : [CONTAIN, Upload this file, button]
-    - try_click: [CONTAIN, Rename, button]
+    - upload: [NAME, repo_upload_file, /file/200KB.bin]
+    - click : [TEXT, Upload this file, button]
+    - try_click: [TEXT, Rename, button]
   - click : [NAME, submitbutton, input]
-  - try_click: [CONTAIN, Remove submission, button]
-  - try_click: [CONTAIN, Continue, button]
+  - expect: [CONTAIN, Submitted for grading, all]
+  - expect: [CONTAIN, 20 files, all]
+  - try_click: [TEXT, Remove submission, button]
+  - try_click: [TEXT, Continue, button]
 
         

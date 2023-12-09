@@ -50,13 +50,14 @@ class GoogleTestCase(unittest.TestCase):
         self.options.add_argument("--silent")
         self.options.add_argument("--show-capture=no")
         self.browser = webdriver.Edge(options=self.options)
-        self.elem_dict = {"button":"button", "link":"a", "title":"title", "input":"input"}
+        self.elem_dict = {"button":"button", "link":"a", "title":"title", "input":"input", "all": "*"}
         self.load_test_case()
         self.addCleanup(self.browser.quit)
 
-    def execute_common_logic(self, step_config, action, actionchains, timeout=10):
+    def execute_common_logic(self, step_config, action, actionchains, timeout=10) -> tuple[bool, str]:
         _type, key, value = step_config[0], step_config[1], step_config[2]
         by_type = getattr(By, _type.upper(), _type)
+        result, msg = True, ""
         try:
             if action == "click":
                 if by_type == "CONTAIN":
@@ -79,8 +80,9 @@ class GoogleTestCase(unittest.TestCase):
                         self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                     element[0].click()
                 else:
-                    result = False
-                    msg = "Failed to appear or click on element within the specified timeout"
+                    result, msg = False, "Failed to appear or click on element within the specified timeout \n"
+                    return result, msg
+
             elif action == "input":
                 if by_type == "CONTAIN":
                     xpath = (f"//input[.//span[contains(text(), '{key}')]\
@@ -107,8 +109,8 @@ class GoogleTestCase(unittest.TestCase):
                     element[0].clear()
                     element[0].send_keys(value)
                 else:
-                    result = False
-                    msg = "Failed to appear or click on element within the specified timeout"
+                    result, msg = False, "Failed to appear or click on element within the specified timeout \n"
+                    return result, msg
 
             elif action == "upload":
                 search_key = (by_type, key)
@@ -120,46 +122,53 @@ class GoogleTestCase(unittest.TestCase):
                 if key.upper() == "GLOBAL":
                     actionchains.send_keys(getattr(Keys, value.upper(), value))
                     actionchains.perform()
-            elif action == "expect":
-                if by_type == "title":
+            elif action == "expect" or action == "expect_not":
+                if by_type == "TITLE":
                     result = EC.title_contains(key)
                     if not result:
-                        msg = "Failed to appear title"
-                elif by_type == "text":
-                    result = EC.text_to_be_present_in_element((By.XPATH, value), key)
-                    if not result:
-                        msg = "Failed to appear text"
-                elif by_type == "CONTAIN":
-                    xpath = f"//{self.elem_dict[value]}[.//span[contains(text(), '{key}')] or contains(text(), '{key}') or @title='{key}' or @class='{key}']"           
-                    result = EC.visibility_of_element_located((By.XPATH, xpath))
-                    if not result:
-                        msg = "Failed to appear element"
+                        result, msg = False, "Failed to appear title \n"
+                        return result, msg
+                if by_type == "CONTAIN":
+                    xpath = (f"//{self.elem_dict[value]}[.//span[contains(text(), '{key}')] or contains(text(), '{key}'))\
+                            or @title='{key}' or @class='{key}' or descendant::div[contains(text(), '{key}')]\
+                            or ancestor::div[contains(text(), '{key}')]]")
+                    search_key = (By.XPATH, xpath)
                 else:
-                    result = EC.visibility_of_element_located((by_type, key))
-                    if not result:
-                        msg = "Failed to appear element"
+                    search_key = (by_type, key)
+
+                if action == "expect_not": 
+                    result = EC.invisibility_of_element_located(search_key)
+                else:
+                    result = EC.visibility_of_element_located(search_key)
+                
+                if result and action == "expect_not":
+                    result, msg = True, f"Expect to not appear {key} \n"
+                elif result and action == "expect":
+                    result, msg = True, f"Expect to appear {key} \n"
+                else:
+                    result, msg = "Failed to appear element \n"
             else:
-                pass
-            return True, "pass"
+                result, msg = False, f"Not support action {action}\n"
+            return result, msg
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
-            msg = f"Failed to do {action} {key} {value}"
-        
-        return False, msg
+            result, msg = False, f"Failed to do {action} {key} {value} \n"
+            return result, msg
       
     def test_execute(self):
         for testcase in self.test_config:
             print(testcase["name"])
+            testcase_msg = ""
             self.browser.get(testcase['url'])
             if not EC.title_contains(testcase["title"]):
-                self.test_report.update({testcase["name"]: "Failed to appear title"})
+                self.test_report.update({testcase["name"]: "Failed to appear title \n"})
                 continue
 
             actionchains = ActionChains(self.browser)
             for index, step in enumerate(testcase['test_steps']):
-                result, msg = True, "pass"
+                result, msg = True, ""
                 print(step)
                 for action, step_config in step.items():
                     if action.split("_")[0] == "iteration":
@@ -185,8 +194,10 @@ class GoogleTestCase(unittest.TestCase):
                             result, msg = self.execute_common_logic(step_config, action.split("_")[1], actionchains)
                     else:
                         result, msg = self.execute_common_logic(step_config, action, actionchains)
-        
-                self.test_report.update({testcase["name"]: msg})
+
+                if msg != "":
+                    testcase_msg += msg
+                self.test_report.update({testcase["name"]: testcase_msg})
                 if not result:
                     break
 
