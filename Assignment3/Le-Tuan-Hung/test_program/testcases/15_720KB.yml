@@ -1,5 +1,5 @@
 browser: edge
-name: Delete 1 submission file
+name: Test submit 15 files 720KB
 url: https://school.moodledemo.net/login/index.php
 title: Log in to the site
 test_steps: 
@@ -17,20 +17,15 @@ test_steps:
   - try_click: [TEXT, Remove submission, button]
   - try_click: [TEXT, Continue, button]
   - click: [TEXT, Add submission, button]
-  - click: [CONTAIN, Add... , link]
-  - upload: [NAME, repo_upload_file, /file/abc.pdf]
-  - click : [TEXT, Upload this file, button]
-  - click: [CONTAIN, Add... , link]
-  - upload: [NAME, repo_upload_file, /file/810KB.bin]
-  - click : [TEXT, Upload this file, button]
-  - click : [NAME, submitbutton, input]
-  - expect: [CONTAIN, 2 files, all]
-  - click : [TEXT, Edit submission, button]
-  - click : [CONTAIN, abc.pdf, link]
-  - click : [TEXT, Delete, button]
-  - click : [TEXT, "Yes", button]
+  - iteration_15:
+    - click: [CONTAIN, Add... , link]
+    - upload: [NAME, repo_upload_file, test_program/file/720KB.bin]
+    - click : [TEXT, Upload this file, button]
+    - try_click: [TEXT, Rename, button]
   - click : [NAME, submitbutton, input]
   - expect: [CONTAIN, Submitted for grading, all]
-  - expect: [CONTAIN, 810KB.bin, all]
+  - expect: [CONTAIN, 15 files, all]
   - try_click: [TEXT, Remove submission, button]
   - try_click: [TEXT, Continue, button]
+
+        
