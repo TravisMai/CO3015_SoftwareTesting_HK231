@@ -1,0 +1,54 @@
+Test submit 15 files 420KB: Passed
+Passed: Expect to appear My courses 
+Passed: Expect to appear Submitted for grading 
+Passed: Expect to appear 15 files 
+
+Test submit 15 files 420KB (2nd flow): Passed
+Passed: Expect to appear My courses 
+Passed: Expect to appear Submitted for grading 
+Passed: Expect to appear 15 files 
+
+Test submit 15 files 720KB: Passed
+Passed: Expect to appear My courses 
+Passed: Expect to appear Submitted for grading 
+Passed: Expect to appear 15 files 
+
+Test submit 20 files 200KB: Passed
+Passed: Expect to appear My courses 
+Passed: Expect to appear Submitted for grading 
+Passed: Expect to appear 20 files 
+
+Test submit 2 files 810KB: Passed
+Passed: Expect to appear My courses 
+Passed: Expect to appear Submitted for grading 
+Passed: Expect to appear 2 files 
+
+Delete 1 submission file: Failed
+Passed: Expect to appear My courses 
+Passed: Expect to appear 2 files 
+Failed: Failed to do click Update button 
+
+Edit Submission: Passed
+Passed: Expect to appear My courses 
+Passed: Expect to appear abc.pdf 
+Passed: Expect to appear Submitted for grading 
+Passed: Expect to appear new_abc.pdf 
+
+User send the message with the length of 100 words to people: Passed
+Passed: Expect to appear My courses 
+
+User send the message with the length of 2000 words to people: Passed
+Passed: Expect to appear My courses 
+
+User send the message with the length of 5000 words to people: Failed
+Passed: Expect to appear My courses 
+Failed: Input send to textarea not as expected 
+
+Block user message: Passed
+Passed: Expect to appear My courses 
+Passed: Expect to appear cannot send a message 
+
+User send the message emoji to people: Passed
+Passed: Expect to appear My courses 
+Passed: Expect to appear 😃 
+

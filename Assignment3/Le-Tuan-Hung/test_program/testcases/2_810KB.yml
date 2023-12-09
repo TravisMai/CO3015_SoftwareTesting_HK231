@@ -1,0 +1,29 @@
+browser: edge
+name: Test submit 2 files 810KB
+url: https://school.moodledemo.net/login/index.php
+title: Log in to the site
+test_steps: 
+# - action: [_type, key, value]
+  - try_click: [TEXT, Log out, button]
+  - input: [ID, username, <clear>]
+  - input: [ID, username, student]
+  - input: [ID, password, moodle]
+  - click: [ID, loginbtn, button]
+  - expect: [TITLE, My courses, title]
+  - input: [NAME, search, Literature of France]
+  - click: [CONTAIN, Literature of France 1100 - 1960, link]
+  - wait_3_press: [KEY, global, ENTER]
+  - click: [CONTAIN, Assignment 02 (16th century), link]
+  - try_click: [TEXT, Remove submission, button]
+  - try_click: [TEXT, Continue, button]
+  - click: [TEXT, Add submission, button]
+  - iteration_2:
+    - click: [CONTAIN, Add... , link]
+    - upload: [NAME, repo_upload_file, test_program/file/810KB.bin]
+    - click : [TEXT, Upload this file, button]
+    - try_click: [TEXT, Rename, button]
+  - click : [NAME, submitbutton, input]
+  - expect: [CONTAIN, Submitted for grading, all]
+  - expect: [CONTAIN, 2 files, all]
+  - try_click: [TEXT, Remove submission, button]
+  - try_click: [TEXT, Continue, button]

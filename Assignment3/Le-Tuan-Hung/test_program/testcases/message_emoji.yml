@@ -1,0 +1,20 @@
+browser: edge
+name: User send the message emoji to people
+url: https://school.moodledemo.net/login/index.php
+title: Log in to the site
+test_steps: 
+# - action: [_type, key, value]
+  - try_click: [TEXT, Log out, button]
+  - input: [ID, username, <clear>]
+  - input: [ID, username, student]
+  - input: [ID, password, moodle]
+  - click: [ID, loginbtn, button]
+  - expect: [TITLE, My courses, title]
+  # I dont know why search by ID does not work, then I use XPATH instead
+  - click: [XPATH, "/html/body/div[2]/nav/div[2]/div[4]/a", link] 
+  - click: [CONTAIN, Private, button]
+  - click: [MSG_BOX, Jeffrey Sander, link]
+  - click: [CONTAIN, Toggle emoji picker, button]
+  - click: [CONTAIN, ":smiley:", button]
+  - click: [CONTAIN, Send message, button]
+  - expect: [CONTAIN, "😃", div]

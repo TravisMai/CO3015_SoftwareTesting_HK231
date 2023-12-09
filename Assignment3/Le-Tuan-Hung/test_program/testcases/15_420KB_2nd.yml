@@ -1,0 +1,30 @@
+browser: edge
+name: Test submit 15 files 420KB (2nd flow)
+url: https://school.moodledemo.net/login/index.php
+title: Log in to the site
+test_steps: 
+# - action: [_type, key, value]
+  - try_click: [TEXT, Log out, button]
+  - input: [ID, username, <clear>]
+  - input: [ID, username, student]
+  - input: [ID, password, moodle]
+  - click: [ID, loginbtn, button]
+  - expect: [TITLE, My courses, title]
+  - click: [TEXT, Dashboard, link]
+  - click: [TEXT, Assignment 02 (16th century), link]
+  - try_click: [CONTAIN, Remove submission, button]
+  - try_click: [CONTAIN, Continue, button]
+  - click: [TEXT, Add submission, button]
+  - iteration_5:
+    - click: [CONTAIN, Add... , link]
+    - upload: [NAME, repo_upload_file, test_program/file/420KB.bin]
+    - click : [TEXT, Upload this file, button]
+    - try_click: [TEXT, Rename, button]
+  - click : [NAME, submitbutton, input]
+  - expect: [CONTAIN, Submitted for grading, all]
+  - expect: [CONTAIN, 15 files, all]
+  - try_click: [TEXT, Remove submission, button]
+  - try_click: [TEXT, Continue, button]
+
+
+        

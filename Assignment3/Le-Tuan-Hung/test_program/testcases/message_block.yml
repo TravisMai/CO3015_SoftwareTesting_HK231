@@ -1,0 +1,35 @@
+browser: edge
+name: Block user message
+url: https://school.moodledemo.net/login/index.php
+title: Log in to the site
+test_steps: 
+# - action: [_type, key, value]
+  - try_click: [TEXT, Log out, button]
+  - input: [ID, username, <clear>]
+  - input: [ID, username, teacher]
+  - input: [ID, password, moodle]
+  - click: [ID, loginbtn, button]
+  - expect: [TITLE, My courses, title]
+  # I dont know why search by ID does not work, then I use XPATH instead
+  - click: [XPATH, "/html/body/div[2]/nav/div[2]/div[4]/a", link] 
+  - click: [CONTAIN, Starred, button]
+  - click: [MSG_BOX, Barbara Gardner, link]
+  - click: [ID, conversation-actions-menu-button, button]
+  - try_click: [TEXT, Unblock user, link]
+  - try_click: [CONTAIN, Unblock, button]
+  - click: [TEXT, Block user, link]
+  - click: [CONTAIN, Block, button]
+  - goto: [URL, self, https://school.moodledemo.net/login/logout.php]
+  - click: [TEXT, Continue, button]
+  - goto: [URL, self, https://school.moodledemo.net/login/index.php]
+  - input: [ID, username, <clear>]
+  - input: [ID, username, student]
+  - input: [ID, password, moodle]
+  - click: [ID, loginbtn, button]
+  - click: [XPATH, "/html/body/div[2]/nav/div[2]/div[4]/a", link]
+  - click: [CONTAIN, Private, button]
+  - click: [MSG_BOX, Jeffrey Sander, link]
+  - input: [TAG_NAME, textarea, <random_200>]
+  - click: [CONTAIN, Send message, button]
+  - expect: [CONTAIN, cannot send a message, div]
+  
