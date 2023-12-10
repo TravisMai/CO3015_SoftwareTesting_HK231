@@ -1,0 +1,75 @@
+test_settings:
+  base_url: "http://localhost:8000"
+  auth:
+    admin:
+      username: "admin"
+      password: "test"
+    teacher:
+      username: "teacher"
+      password: "test"
+    student:
+      username: "student"
+      password: "teacher"
+  browser:
+    - chrome
+    # - firefox
+    # - safari
+  implicitly_wait: 5
+  browser_size: "1280x720"
+  headless: false
+
+tests:
+  add_discussion:
+    simple_normal_flow:
+      - subject: "Test"
+        content: "Test"
+      - subject: "Lorem Ipsum"
+        content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi varius lacus fermentum, iaculis felis nec, maximus sem. Nunc et tempor massa, eu posuere leo. Donec et facilisis orci. Ut laoreet facilisis nulla, eu porta lacus. Vivamus semper augue eget lobortis eleifend. In semper ipsum sed elementum aliquet. Integer porta, tellus vel dignissim dapibus, mi massa faucibus felis, vel tincidunt dui ex at nisi."
+
+    simple_error_flow:
+      - subject: ""
+        content: ""
+        subject_error: "- Required"
+        content_error: "- Required"
+      - subject: ""
+        content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi varius lacus fermentum, iaculis felis nec, maximus sem. Nunc et tempor massa, eu posuere leo. Donec et facilisis orci. Ut laoreet facilisis nulla, eu porta lacus. Vivamus semper augue eget lobortis eleifend. In semper ipsum sed elementum aliquet. Integer porta, tellus vel dignissim dapibus, mi massa faucibus felis, vel tincidunt dui ex at nisi."
+        subject_error: "- Required"
+      - subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi varius lacus fermentum, iaculis felis nec, maximus sem. Nunc et tempor massa, eu posuere leo. Donec et facilisis orci. Ut laoreet facilisis nulla, eu porta lacus. Vivamus semper augue eget lobortis eleifend. In semper ipsum sed elementum aliquet. Integer porta, tellus vel dignissim dapibus, mi massa faucibus felis, vel tincidunt dui ex at nisi."
+        content: ""
+        subject_error: "- Maximum of 255 characters"
+        content_error: "- Required"
+      - subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi varius lacus fermentum, iaculis felis nec, maximus sem. Nunc et tempor massa, eu posuere leo. Donec et facilisis orci. Ut laoreet facilisis nulla, eu porta lacus. Vivamus semper augue eget lobortis eleifend. In semper ipsum sed elementum aliquet. Integer porta, tellus vel dignissim dapibus, mi massa faucibus felis, vel tincidunt dui ex at nisi."
+        content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi varius lacus fermentum, iaculis felis nec, maximus sem. Nunc et tempor massa, eu posuere leo. Donec et facilisis orci. Ut laoreet facilisis nulla, eu porta lacus. Vivamus semper augue eget lobortis eleifend. In semper ipsum sed elementum aliquet. Integer porta, tellus vel dignissim dapibus, mi massa faucibus felis, vel tincidunt dui ex at nisi."
+        subject_error: "- Maximum of 255 characters"
+    upload_file_normal:
+      - file_size: 100.0
+      - file_size: 200.0
+      - file_size: 400.0
+      - file_size: 500.0
+    upload_file_too_large:
+      - file_size: 501.0
+      - file_size: 750.0
+      - file_size: 1000.0
+      - file_size: 200_000.0
+    upload_file_too_large_php:
+      - file_size: 201_000.0
+      - file_size: 500_000.0
+
+  add_file_resource:
+    upload_file_normal:
+      - file_size: 100.0
+        name: "100KB file"
+      - file_size: 200.0
+        name: "200KB file"
+      - file_size: 400.0
+        name: "400KB file"
+      - file_size: 500.0
+        name: "500KB file"
+    file_not_selected:
+      - name: "Test file"
+      - name: "John"
+    file_name_too_long:
+      - name: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi varius lacus fermentum, iaculis felis nec, maximus sem. Nunc et tempor massa, eu posuere leo. Donec et facilisis orci. Ut laoreet facilisis nulla, eu porta lacus. Vivamus semper augue eget lobortis eleifend. In semper ipsum sed elementum aliquet. Integer porta, tellus vel dignissim dapibus, mi massa faucibus felis, vel tincidunt dui ex at nisi."
+    file_too_large_php:
+      - file_size: 201_000.0
+        name: "201MB file"
