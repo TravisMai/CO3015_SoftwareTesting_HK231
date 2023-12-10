@@ -1,0 +1,15 @@
+Test function,Status,Expected
+Test add course 1,Successful,Successful
+Test add course 2,Successful,Successful
+Test add course 3,Successful,Successful
+Test add course 4,Successful,Successful
+Test add course 5,Successful,Successful
+Test add course 6,Fail,Fail
+Test add course category 1,Successful,Successful
+Test add course category 2,Successful,Successful
+Test add course category 3,Successful,Successful
+Test add course category 4,Successful,Successful
+Test upload 1,Successful,Successful
+Test upload 2,Fail,Fail
+Test upload 3,Successful,Successful
+Test upload 4,Fail,Fail
