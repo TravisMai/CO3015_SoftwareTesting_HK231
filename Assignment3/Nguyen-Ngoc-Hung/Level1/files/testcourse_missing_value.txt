@@ -1,0 +1,2 @@
+fullname,category
+Course fields example 2,1
