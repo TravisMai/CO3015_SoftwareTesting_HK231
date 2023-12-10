@@ -1,0 +1,2 @@
+fullname,category
+Course fields examasdasdple,1

@@ -1,0 +1,7 @@
+shortname,fullname,expected
+TC0001,Test Course 0001,Successful
+TC0002,Test Course 0002,Successful
+TC0003,Test Course 0003,Successful
+TC0004,Test Course 0004,Successful
+TC0005,Test Course 0005,Successful
+TC0006,,Fail

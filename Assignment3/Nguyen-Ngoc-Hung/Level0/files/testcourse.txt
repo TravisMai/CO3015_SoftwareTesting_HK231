@@ -1,0 +1,2 @@
+shortname,fullname,category
+CF1casdasdc,Course fields examplasdasdasesd,1

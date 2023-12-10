@@ -1,0 +1,9 @@
+Test function,Status,Expected
+Test add quiz 1,Successful,Successful
+Test add quiz 2,Successful,Successful
+Test add quiz 3,Successful,Successful
+Test add quiz 4,Successful,Successful
+Test add quiz 5,Fail,Fail
+Test add quiz 6,Successful,Successful
+Test add quiz 7,Successful,Successful
+Test add quiz 8,Fail,Fail

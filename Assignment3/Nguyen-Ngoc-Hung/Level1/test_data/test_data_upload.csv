@@ -1,0 +1,5 @@
+filename,expected
+testcourse.csv,Successful
+testcourse_missing_value.txt,Fail
+testcourse.txt,Successful
+testcourse.pdf,Fail
